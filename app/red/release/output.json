@@ -1,0 +1,18 @@
+[
+  {
+    "outputType": {
+      "type": "APK"
+    },
+    "apkInfo": {
+      "type": "MAIN",
+      "splits": [],
+      "versionCode": 1
+    },
+    "path": "app-red-release.apk",
+    "properties": {
+      "packageId": "com.mihanjk.fintechhomework",
+      "split": "",
+      "minSdkVersion": "15"
+    }
+  }
+]
