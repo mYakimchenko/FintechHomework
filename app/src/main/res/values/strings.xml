@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">FintechHomework</string>
+    <string name="edit_text_hint">Enter something, please</string>
+    <string name="implicit_intent_button">Send implicit intent</string>
+    <string name="explicit_intent_button">Send explicit intent</string>
+    <string name="no_text_application_install">Can\'t find any application to send text</string>
+    <string name="ok_button">OK</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="activity_result_ok">User clicked OK</string>
+    <string name="activity_result_cancel">Result was cancelled</string>
+    <string name="default_message">There\'s nothing to show :(</string>
 </resources>
