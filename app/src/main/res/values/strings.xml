@@ -2,4 +2,6 @@
     <string name="app_name">FintechHomework</string>
     <string name="first_button">First</string>
     <string name="second_button">Second</string>
+    <string name="first_number">First</string>
+    <string name="second_number">Second</string>
 </resources>
