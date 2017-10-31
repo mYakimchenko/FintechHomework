@@ -11,7 +11,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         graph.mValues = generateSequence(Pair(0f, 0f),
-                { pair -> Pair(pair.first + 10, pair.second + 10) })
+                { pair -> Pair(pair.first * 2 + 5, pair.second + 10) })
                 .take(10).toList()
+//        graph.mValues = listOf(Pair(20f, 50f), Pair(100f, 500f))
     }
 }
