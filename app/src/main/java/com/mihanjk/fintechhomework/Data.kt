@@ -7,3 +7,4 @@ data class Second(val name: String,
 
 data class Third(val money_amount: BigDecimal)
 
+
