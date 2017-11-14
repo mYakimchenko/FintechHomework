@@ -14,15 +14,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
-import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.node_list_item.view.*
 
 class MainActivity : NodeRecyclerViewAdapter.OnRecyclerViewAction, AppCompatActivity() {
     lateinit var mAdapter: NodeRecyclerViewAdapter
     lateinit var mDatabase: NodeDao
+    lateinit var mHelper: NodeDatabaseHelper
 
     override fun onItemClicked(node: Node) {
         startActivity(Intent(this, NodeRelationsActivity::class.java).apply {
@@ -34,36 +32,30 @@ class MainActivity : NodeRecyclerViewAdapter.OnRecyclerViewAction, AppCompatActi
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mDatabase = Injection.provideUserDataSource(this)
+        mHelper = Injection.provideUserDataSource(this)
 
-        Completable.fromAction { mDatabase.insertRelations(NodeChildren(1, 2)) }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe()
+//        mDatabase = Injection.provideUserDataSource(this)
 
-        mDatabase.getNodes()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    NodeRecyclerViewAdapter(if (it.isEmpty()) ArrayList() else (it as MutableList),
-                            this).let {
-                        mAdapter = it
-                        recyclerView.adapter = it
-                    }
-                }
+//        Completable.fromAction { mDatabase.insertRelations(NodeChildren(1, 2)) }
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe()
+
+//        mDatabase.getNode()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe {
+//                    NodeRecyclerViewAdapter(if (it.isEmpty()) ArrayList() else (it as MutableList),
+//                            this).let {
+//                        mAdapter = it
+//                        recyclerView.adapter = it
+//                    }
+//                }
 
 
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (dy > 0 && floatingActionButton.visibility == View.VISIBLE) {
-                    floatingActionButton.hide()
-                } else if (dy < 0 && floatingActionButton.visibility != View.VISIBLE) {
-                    floatingActionButton.show()
-                }
-            }
-        })
+        mAdapter = NodeRecyclerViewAdapter(mHelper.getNode(), this)
+        recyclerView.adapter = mAdapter
 
         floatingActionButton.setOnClickListener {
             val editText = EditText(this@MainActivity).apply {
@@ -88,17 +80,22 @@ class MainActivity : NodeRecyclerViewAdapter.OnRecyclerViewAction, AppCompatActi
     }
 
     private fun addNewNode(value: Int) {
+        val nodeId = mHelper.insertNode(value)
         mAdapter.apply {
-            val element = Node(value, emptyList())
-            Completable.fromAction { mDatabase.insertNode(element) }
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe {
-                        mValues.add(element)
-                        notifyItemInserted(mValues.indexOf(element))
-                        notifyDataSetChanged()
-                    }
+            mValues.add(mHelper.getNode(nodeId)[0])
+            notifyDataSetChanged()
         }
+//        mAdapter.apply {
+//            val element = Node(value, emptyList())
+//            Completable.fromAction { mDatabase.insertNode(element) }
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe {
+//                        mValues.add(element)
+//                        notifyItemInserted(mValues.indexOf(element))
+//                        notifyDataSetChanged()
+//                    }
+//        }
     }
 }
 

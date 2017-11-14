@@ -12,19 +12,18 @@ import kotlinx.android.synthetic.main.activity_node_relations.*
 class NodeRelationsActivity : NodeRelationFragment.OnListFragmentInteractionListener,
         AppCompatActivity() {
 
-    override fun getParents() =
-            Injection.provideUserDataSource(this).getParentsNodes(mNodeKey)
+    override fun getParents(childId: Long) = mHelper.getParents(childId)
 
-    override fun getChildren() =
-            Injection.provideUserDataSource(this).getChildrenNodes(mNodeKey)
+    override fun getChildren(parentId: Long) = mHelper.getChildren(parentId)
 
     companion object {
         const val PARENT_FRAGMENT = "Parent"
         const val CHILD_FRAGMENT = "Child"
         const val NODE_KEY = "Node"
+        var nodeKey = 0L
     }
 
-    private var mNodeKey = 0L
+    lateinit var mHelper: NodeDatabaseHelper
 
     override fun onListFragmentInteraction(item: Node) {
         Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show()
@@ -44,7 +43,8 @@ class NodeRelationsActivity : NodeRelationFragment.OnListFragmentInteractionList
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_node_relations)
 
-        mNodeKey = intent.extras.getLong(NODE_KEY)
+        nodeKey = intent.extras.getLong(NODE_KEY)
+        mHelper = Injection.provideUserDataSource(this)
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

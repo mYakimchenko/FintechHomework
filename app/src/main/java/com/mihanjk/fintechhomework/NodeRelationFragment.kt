@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import io.reactivex.Flowable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.view.*
@@ -39,15 +38,14 @@ class NodeRelationFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         val view = inflater!!.inflate(R.layout.fragment_item_list, container, false)
         when (mFragmentType) {
-            NodeRelationsActivity.PARENT_FRAGMENT -> mListener?.getParents()
-            NodeRelationsActivity.CHILD_FRAGMENT -> mListener?.getChildren()
+            NodeRelationsActivity.PARENT_FRAGMENT -> {
+                mListener?.get
+//                mListener?.getParents(NodeRelationsActivity.nodeKey)
+            }
+            NodeRelationsActivity.CHILD_FRAGMENT -> mListener?.getChildren(NodeRelationsActivity.nodeKey)
             else -> throw Exception("Unknown fragment type")
         }?.apply {
-            subscribeOn(Schedulers.io())
-            observeOn(AndroidSchedulers.mainThread())
-            subscribe {
-                view.recyclerView.adapter = NodeRelationRecyclerViewAdapter(it, mListener)
-            }
+            view.recyclerView.adapter = NodeRelationRecyclerViewAdapter(this, mListener)
         }
         return view
     }
@@ -69,8 +67,8 @@ class NodeRelationFragment : Fragment() {
 
     interface OnListFragmentInteractionListener {
         fun onListFragmentInteraction(item: Node)
-        fun getParents(): Flowable<List<Node>>
-        fun getChildren(): Flowable<List<Node>>
+        fun getParents(childId: Long): List<Node>
+        fun getChildren(parentId: Long): List<Node>
     }
 
     companion object {

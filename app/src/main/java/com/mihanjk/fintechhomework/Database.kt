@@ -73,10 +73,10 @@ abstract class NodeDatabase : RoomDatabase() {
     }
 }
 
-object Injection {
-
-    fun provideUserDataSource(context: Context): NodeDao {
-        val database = NodeDatabase.getInstance(context)
-        return database.getNodeDao()
-    }
-}
+//object Injection {
+//
+//    fun provideUserDataSource(context: Context): NodeDao {
+//        val database = NodeDatabase.getInstance(context)
+//        return database.getNodeDao()
+//    }
+//}
