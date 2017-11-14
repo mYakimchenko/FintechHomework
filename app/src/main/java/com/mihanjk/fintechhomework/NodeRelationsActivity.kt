@@ -7,17 +7,26 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
-import com.mihanjk.fintechhomework.dummy.DummyContent
 import kotlinx.android.synthetic.main.activity_node_relations.*
 
 class NodeRelationsActivity : NodeRelationFragment.OnListFragmentInteractionListener,
         AppCompatActivity() {
+
+    override fun getParents() =
+            Injection.provideUserDataSource(this).getParentsNodes(mNodeKey)
+
+    override fun getChildren() =
+            Injection.provideUserDataSource(this).getChildrenNodes(mNodeKey)
+
     companion object {
         const val PARENT_FRAGMENT = "Parent"
         const val CHILD_FRAGMENT = "Child"
+        const val NODE_KEY = "Node"
     }
 
-    override fun onListFragmentInteraction(item: DummyContent.DummyItem) {
+    private var mNodeKey = 0L
+
+    override fun onListFragmentInteraction(item: Node) {
         Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show()
     }
 
@@ -34,6 +43,8 @@ class NodeRelationsActivity : NodeRelationFragment.OnListFragmentInteractionList
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_node_relations)
+
+        mNodeKey = intent.extras.getLong(NODE_KEY)
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -53,10 +64,8 @@ class NodeRelationsActivity : NodeRelationFragment.OnListFragmentInteractionList
 
         override fun getItem(position: Int): Fragment =
                 when (position) {
-                    0 -> supportFragmentManager.findFragmentByTag(PARENT_FRAGMENT) ?:
-                            NodeRelationFragment.newInstance(1)
-                    1 -> supportFragmentManager.findFragmentByTag(CHILD_FRAGMENT) ?:
-                            NodeRelationFragment.newInstance(1)
+                    0 -> NodeRelationFragment.newInstance(PARENT_FRAGMENT)
+                    1 -> NodeRelationFragment.newInstance(CHILD_FRAGMENT)
                     else -> throw Exception("Unknown position")
                 }
 

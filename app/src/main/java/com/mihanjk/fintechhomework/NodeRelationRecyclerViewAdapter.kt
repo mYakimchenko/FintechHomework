@@ -7,10 +7,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 import com.mihanjk.fintechhomework.NodeRelationFragment.OnListFragmentInteractionListener
-import com.mihanjk.fintechhomework.dummy.DummyContent.DummyItem
 import kotlinx.android.synthetic.main.fragment_item.view.*
 
-class NodeRelationRecyclerViewAdapter(private val mValues: List<DummyItem>,
+class NodeRelationRecyclerViewAdapter(private val mValues: List<Node>,
                                       private val mListener: OnListFragmentInteractionListener?) :
         RecyclerView.Adapter<NodeRelationRecyclerViewAdapter.ViewHolder>() {
 
@@ -22,8 +21,8 @@ class NodeRelationRecyclerViewAdapter(private val mValues: List<DummyItem>,
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.mItem = mValues[position]
-        holder.mNodeId.text = mValues[position].id
-        holder.mNodeValue.text = mValues[position].content
+        holder.mNodeId.text = mValues[position].id.toString()
+        holder.mNodeValue.text = mValues[position].value.toString()
 
         holder.mView.setOnClickListener {
             mListener?.onListFragmentInteraction(holder.mItem)
@@ -33,7 +32,7 @@ class NodeRelationRecyclerViewAdapter(private val mValues: List<DummyItem>,
     override fun getItemCount(): Int = mValues.size
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
-        lateinit var mItem: DummyItem
+        lateinit var mItem: Node
         val mNodeId: TextView = mView.nodeId
         val mNodeValue: TextView = mView.nodeValue
     }

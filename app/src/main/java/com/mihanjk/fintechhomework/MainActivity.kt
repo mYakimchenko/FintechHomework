@@ -14,24 +14,44 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.node_list_item.view.*
 
 class MainActivity : NodeRecyclerViewAdapter.OnRecyclerViewAction, AppCompatActivity() {
     lateinit var mAdapter: NodeRecyclerViewAdapter
+    lateinit var mDatabase: NodeDao
 
     override fun onItemClicked(node: Node) {
-        startActivity(Intent(this, NodeRelationsActivity::class.java))
+        startActivity(Intent(this, NodeRelationsActivity::class.java).apply {
+            putExtra(NodeRelationsActivity.NODE_KEY, node.id)
+        })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        NodeRecyclerViewAdapter(ArrayList(), this).let {
-            mAdapter = it
-            recyclerView.adapter = it
-        }
+        mDatabase = Injection.provideUserDataSource(this)
+
+        Completable.fromAction { mDatabase.insertRelations(NodeChildren(1, 2)) }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe()
+
+        mDatabase.getNodes()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    NodeRecyclerViewAdapter(if (it.isEmpty()) ArrayList() else (it as MutableList),
+                            this).let {
+                        mAdapter = it
+                        recyclerView.adapter = it
+                    }
+                }
+
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -70,9 +90,14 @@ class MainActivity : NodeRecyclerViewAdapter.OnRecyclerViewAction, AppCompatActi
     private fun addNewNode(value: Int) {
         mAdapter.apply {
             val element = Node(value, emptyList())
-            mValues.add(element)
-            notifyItemInserted(mValues.indexOf(element))
-            notifyDataSetChanged()
+            Completable.fromAction { mDatabase.insertNode(element) }
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        mValues.add(element)
+                        notifyItemInserted(mValues.indexOf(element))
+                        notifyDataSetChanged()
+                    }
         }
     }
 }
@@ -94,10 +119,12 @@ class NodeRecyclerViewAdapter(val mValues: MutableList<Node>,
         val item = holder.mItem
         holder.mNodeValue.text = item.value.toString()
 
-        val isParent = mValues.any { it.children.contains(item) }
-        holder.mView.setBackgroundColor(when (item.children.isNotEmpty()) {
-            true -> if (isParent) R.color.red else R.color.yellow
-            false -> if (isParent) R.color.blue else Color.TRANSPARENT
+        val isHaveChild = (item.children != null && item.children.isNotEmpty())
+        val isHaveParent = mValues.any { if (it.children == null) false else it.children.contains(item) }
+
+        holder.mView.setBackgroundColor(when (isHaveChild) {
+            true -> if (isHaveParent) R.color.red else R.color.yellow
+            false -> if (isHaveParent) R.color.blue else Color.TRANSPARENT
         })
         holder.mView.setOnClickListener { mListener.onItemClicked(item) }
     }
