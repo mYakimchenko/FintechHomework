@@ -9,13 +9,13 @@ import com.mihanjk.fintechhomework.model.entity.News
 import kotlinx.android.synthetic.main.news_item.view.*
 
 
-class NewsAdapter(var news: List<News>): RecyclerView.Adapter<NewsAdapter.ViewHolder>() {
+class NewsAdapter(var values: List<News>): RecyclerView.Adapter<NewsAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindNews(news[position])
+        holder.bindNews(values[position])
     }
 
-    override fun getItemCount(): Int = news.size
+    override fun getItemCount(): Int = values.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
         ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.news_item, parent, false))
@@ -24,5 +24,10 @@ class NewsAdapter(var news: List<News>): RecyclerView.Adapter<NewsAdapter.ViewHo
         fun bindNews(news: News) {
             itemView.newsTitle.text = news.title
         }
+    }
+
+    fun updateData(news: List<News>) {
+        values = news
+        notifyDataSetChanged()
     }
 }

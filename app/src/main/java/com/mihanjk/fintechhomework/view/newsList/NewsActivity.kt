@@ -17,13 +17,16 @@ class NewsActivity : NewsView, MvpAppCompatActivity() {
     @InjectPresenter
     lateinit var mNewsPresenter: NewsPresenter
 
+    private lateinit var mAdapter: NewsAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         newsList.layoutManager = LinearLayoutManager(this)
         newsList.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        newsList.adapter = NewsAdapter(emptyList())
+        mAdapter = NewsAdapter(emptyList())
+        newsList.adapter = mAdapter
 
         swipeRefresh.setOnRefreshListener { mNewsPresenter.getNews() }
     }
@@ -45,7 +48,6 @@ class NewsActivity : NewsView, MvpAppCompatActivity() {
     }
 
     override fun showData(news: List<News>) {
-        newsList.adapter = NewsAdapter(news)
-        newsList.adapter.notifyDataSetChanged()
+        mAdapter.updateData(news)
     }
 }

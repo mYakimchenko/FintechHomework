@@ -1,5 +1,6 @@
 package com.mihanjk.fintechhomework.presenter.newsList
 
+import android.util.Log
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.mihanjk.fintechhomework.model.entity.News
@@ -29,7 +30,10 @@ class NewsPresenter : MvpPresenter<NewsView>() {
                         mLastUpdate = Date().time
                         viewState.showData(mCachedNews)
                     },
-                            { viewState.showError(it.localizedMessage) })
+                            {
+                                Log.d("News", it.localizedMessage)
+                                viewState.showError(it.localizedMessage)
+                            })
         } else {
             viewState.hideLoading()
             viewState.showData(mCachedNews)

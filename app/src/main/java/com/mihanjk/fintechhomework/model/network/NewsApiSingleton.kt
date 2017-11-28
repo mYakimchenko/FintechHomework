@@ -19,6 +19,7 @@ interface TinkoffNewsApi {
 
 object NewsApiSingleton {
     private val mGson: Gson = GsonBuilder()
+            // todo why token with type List<News> doesn't work?
             .registerTypeAdapter(object : TypeToken<NewsList>() {}.type, NewsTypeAdapter())
             .create()
 
@@ -47,5 +48,4 @@ class NewsTypeAdapter : JsonDeserializer<NewsList> {
         Log.d("News", result.toString())
         return NewsList(result)
     }
-
 }
